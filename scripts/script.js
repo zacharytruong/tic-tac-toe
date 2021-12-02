@@ -1,65 +1,41 @@
-const gameboard = ( function () {
+const game = ( function () {
+
+  const playArea = [];
+  // const tile = () => {
+  //   const createNewTile = () => {
+  //     const span = document.createElement("span");
+  //     span.classList.add("marker");
+  //     const div = document.createElement("div");
+  //     div.classList.add("game-cell");
+  //     div.appendChild(span);
+  //   }
+  //   return {createNewTile};
+  // }
+  // const gameTileFactory = (status, owner) => {
+  //   const prototype = tile();
+  //   this.status = status;
+  //   this.owner = owner;
+  //   return Object.assign(
+  //     {},
+  //     this.status,
+  //     prototype,
+  //   )
+  // }
+  const Person = (name) => {
+    const sayName = () => console.log(name)
+    return {sayName};
+  }
+  const Nerd = (name, status) => {
+    let obj = Object.create(Person(name));
+    obj.status = status;
+    return {obj, status}
+  }
+  // Cache Dom
+  const gameboard = document.getElementById("gameboard");
   
-  const gameboard = [];
-  const cell = {
-    createNewCell: function () {
-      const div = document.createElement("div");
-      const span = document.createElement("span");
-      div.classList.add("game-cell");
-      span.classList.add("marker");
-      div.appendChild(span);
-    }
-  }
-  const cellFactory = (status) => {
-    const gameCell = Object.create(cell);
-    gameCell.status = status;
-    return {
-      gameCell,
-    }
-  }
-
-  // Cache DOM
-  const newGame = document.getElementById("new-game");
-  const gameCells = Array.from(document.getElementsByClassName("game-cell"));
-  const gameBoard = document.getElementById("gameboard");
   
-  _createAllCells();
-  _render();
-  
-  // Bind events
-  gameCells.forEach( cell => {
-    cell.addEventListener("click", setMark)
-  })
-  newGame.addEventListener("click", createNewGame);
+  const Jeff = Nerd("Jeff", false);
+  // const George = Nerd("George");
+  console.log(Jeff);
 
-  // Functions
-  function _createAllCells () {
-    for (let i = 1; i < 10; i++) {
-      const singleGameCell = cellFactory(false);
-      gameboard.push(singleGameCell);
-    }
-  }
-  function _clearBoard () {
-    while (gameBoard.firstChild) {
-      gameBoard.removeChild(gameBoard.firstChild);
-    }
-  }
-  function _render () {
-    _clearBoard();
-    gameboard.forEach( cell => {
-      const newCell = cell.createNewCell();
-      gameBoard.appendChild(newCell);
-    })
-  }
-  function setMark () {
-
-  }
-  function createNewGame () {
-    
-  }
-
-  return {
-    createNewGame,
-    setMark,
-  }
 })();
