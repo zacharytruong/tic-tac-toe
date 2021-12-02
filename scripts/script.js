@@ -1,25 +1,30 @@
 const gameboard = ( function () {
   
   const gameboard = [];
-  const cell = (status, spanClass, cellClass) => {
-    this.status = status;
-    return {
-      status,
+  const cell = {
+    createNewCell: function () {
+      const div = document.createElement("div");
+      const span = document.createElement("span");
+      div.classList.add("game-cell");
+      span.classList.add("marker");
+      div.appendChild(span);
     }
   }
-  // cell.prototype.createCell = () => {
-  //   const span = document.createElement("span");
-  //   span.classList.add(spanClass);
-  //   const div = document.createElement("div");
-  //   div.classList.add(cellClass);
-  //   div.appendChild(span);
-  // };
-  _createAllCells();
-  
-  
+  const cellFactory = (status) => {
+    const gameCell = Object.create(cell);
+    gameCell.status = status;
+    return {
+      gameCell,
+    }
+  }
+
   // Cache DOM
   const newGame = document.getElementById("new-game");
   const gameCells = Array.from(document.getElementsByClassName("game-cell"));
+  const gameBoard = document.getElementById("gameboard");
+  
+  _createAllCells();
+  _render();
   
   // Bind events
   gameCells.forEach( cell => {
@@ -27,12 +32,24 @@ const gameboard = ( function () {
   })
   newGame.addEventListener("click", createNewGame);
 
+  // Functions
   function _createAllCells () {
     for (let i = 1; i < 10; i++) {
-      const gameCell = cell(false, "span", "div");
-      gameboard.push(gameCell);
+      const singleGameCell = cellFactory(false);
+      gameboard.push(singleGameCell);
     }
-    console.log(gameboard);
+  }
+  function _clearBoard () {
+    while (gameBoard.firstChild) {
+      gameBoard.removeChild(gameBoard.firstChild);
+    }
+  }
+  function _render () {
+    _clearBoard();
+    gameboard.forEach( cell => {
+      const newCell = cell.createNewCell();
+      gameBoard.appendChild(newCell);
+    })
   }
   function setMark () {
 
@@ -40,16 +57,9 @@ const gameboard = ( function () {
   function createNewGame () {
     
   }
-  function _render () {
-
-  }
-  function init () {
-
-  }
 
   return {
     createNewGame,
     setMark,
-    init,
   }
 })();
