@@ -99,22 +99,22 @@ const gameboard = ( function () {
     _render();
 
     // Computer's turn
-    setTimeout(_computerPlay, 1500);
-
-    // Render info
-    _displayInfo();
     _switchTurn();
-    _render();
+    _displayInfo();
+    setTimeout(_computerPlay, 500);
+
     function _computerPlay () {
       let randomNum = Math.floor(Math.random() * GAMEBOARD.length);
       while (GAMEBOARD[randomNum].status === true){
-        return randomNum = Math.floor(Math.random() * GAMEBOARD.length);
+        randomNum = Math.floor(Math.random() * GAMEBOARD.length);
       }
       _changeOwner(computer, randomNum);
+      _switchTurn();
+      _displayInfo();
+      _render();
     }
     
   }
-
   // Execution
   _init();
 })();
