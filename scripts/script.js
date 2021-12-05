@@ -1,7 +1,7 @@
 const gameboard = ( function () {
 
   const GAMEBOARD = [];
-  const tileFactory = (status, owner, content) => {
+  const Tile = (status, owner, content) => {
     this.status = status;
     this.owner = owner;
     this.content = content;
@@ -11,18 +11,20 @@ const gameboard = ( function () {
       content,
     }
   }
-  const Player = (name, curentTurn, isWinner) => {
+  const Player = (name, curentTurn, isWinner, marker) => {
     this.name = name;
     this.curentTurn = curentTurn;
     this.isWinner = isWinner;
+    this.marker = marker;
     return {
       name,
       curentTurn,
       isWinner,
+      marker,
     }
   }
-  const player = Player("Player", true, false);
-  const computer = Player("Computer", false, false);
+  const player = Player("Player", true, false, "X");
+  const computer = Player("Computer", false, false, "O");
 
   // Cache Dom
   const gameboard = document.getElementById("gameboard");
@@ -34,7 +36,7 @@ const gameboard = ( function () {
   function _bindGameGrid () {
     let gameCells = _getGameGrid();
     gameCells.forEach(gameCell => {
-      gameCell.addEventListener("click", _gamePlay);
+      gameCell.addEventListener("click", _gamePlay.bind(gameCell));
     })
   }
 
@@ -44,17 +46,9 @@ const gameboard = ( function () {
     _createGameboardTiles(10);
     _render();
   }
-  function _createNewTileDiv () {
-    const span = document.createElement("span");
-    span.classList.add("marker");
-    const div = document.createElement("div");
-    div.classList.add("game-cell");
-    div.appendChild(span);
-    return div;
-  }
   function _createGameboardTiles (num) {
     for (let i = 1; i < num; i++){
-      let gameTile = tileFactory(false, "", "");
+      let gameTile = Tile(false, "", "");
       GAMEBOARD.push(gameTile);
     }
   }
@@ -62,18 +56,17 @@ const gameboard = ( function () {
     const gameCells = Array.from(document.getElementsByClassName("game-cell"));
     return gameCells;
   }
-  function _removeGameTiles (parent) {
-    while (parent.firstChild) {
-      parent.removeChild(parent.firstChild);
-    }
-  }
   function _render () {
-    GAMEBOARD.forEach( () => {
-      gameboard.appendChild(_createNewTileDiv());
-    })
+    let template = "";
+    GAMEBOARD.forEach( gameboardTile => {
+      gameboardTile.div = `<div class="game-cell flex center"><span class="marker">${gameboardTile.content}</span></div>`;
+      template += gameboardTile.div;
+    });
+    gameboard.innerHTML = template;
   }
   function _reset () {
-    _removeGameTiles(gameboard);
+    player.curentTurn = true;
+    computer.curentTurn = false;
     _render();
   }
   function _displayInfo () {
@@ -96,11 +89,15 @@ const gameboard = ( function () {
     }
   }
   function _gamePlay () {
-    _switchTurn();
-    _displayInfo();
+    let idx = _getGameGrid().indexOf(this);
+    GAMEBOARD[idx].content = player.marker;
+    GAMEBOARD[idx].owner = player.name;
+    console.log(GAMEBOARD)
+    // _switchTurn();
+    // _displayInfo();
+    _render();
   }
 
   // Execution
   _init();
-  _bindGameGrid();
 })();
