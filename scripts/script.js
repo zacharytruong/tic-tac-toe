@@ -1,10 +1,11 @@
 const gameboard = ( function () {
 
   const GAMEBOARD = [];
-  const Tile = (status, owner, content) => {
+  const Tile = (status, owner, content, div) => {
     this.status = status;
     this.owner = owner;
     this.content = content;
+    this.div = div;
     return {
       status,
       owner,
@@ -30,15 +31,10 @@ const gameboard = ( function () {
   const gameboard = document.getElementById("gameboard");
   const newGame = document.getElementById("new-game");
   const info = document.getElementById("info");
-  
+
   // Bind events
   newGame.addEventListener("click", _reset);
-  function _bindGameGrid () {
-    let gameCells = _getGameGrid();
-    gameCells.forEach(gameCell => {
-      gameCell.addEventListener("click", _gamePlay.bind(gameCell));
-    })
-  }
+  gameboard.addEventListener("click", _playGame)
 
   // Functions
   function _init () {
@@ -48,13 +44,9 @@ const gameboard = ( function () {
   }
   function _createGameboardTiles (num) {
     for (let i = 1; i < num; i++){
-      let gameTile = Tile(false, "", "");
+      let gameTile = Tile(false, "", "", "");
       GAMEBOARD.push(gameTile);
     }
-  }
-  function _getGameGrid () {
-    const gameCells = Array.from(document.getElementsByClassName("game-cell"));
-    return gameCells;
   }
   function _render () {
     let template = "";
@@ -88,14 +80,39 @@ const gameboard = ( function () {
       computer.curentTurn = true;
     }
   }
-  function _gamePlay () {
-    let idx = _getGameGrid().indexOf(this);
-    GAMEBOARD[idx].content = player.marker;
-    GAMEBOARD[idx].owner = player.name;
-    console.log(GAMEBOARD)
-    // _switchTurn();
-    // _displayInfo();
+  function _changeOwner (obj, idx) {
+    GAMEBOARD[idx].content = obj.marker;
+    GAMEBOARD[idx].owner = obj.name;
+    GAMEBOARD[idx].status = true;
+  }
+  function _playGame (e) {
+    let list = Array.from(gameboard.querySelectorAll(".game-cell"));
+
+    // Player's turn
+    let gamecell = e.target.closest(".game-cell");
+    let idx = list.indexOf(gamecell);
+    if (GAMEBOARD[idx].status === true) {
+      return;
+    } else {
+      _changeOwner(player, idx);
+    }
     _render();
+
+    // Computer's turn
+    setTimeout(_computerPlay, 1500);
+
+    // Render info
+    _displayInfo();
+    _switchTurn();
+    _render();
+    function _computerPlay () {
+      let randomNum = Math.floor(Math.random() * GAMEBOARD.length);
+      while (GAMEBOARD[randomNum].status === true){
+        return randomNum = Math.floor(Math.random() * GAMEBOARD.length);
+      }
+      _changeOwner(computer, randomNum);
+    }
+    
   }
 
   // Execution
