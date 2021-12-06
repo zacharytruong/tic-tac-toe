@@ -1,6 +1,7 @@
 const gameboard = ( function () {
 
   const GAMEBOARD = [];
+  const playersArray = [];
   const Tile = (status, owner, content, div) => {
     this.status = status;
     this.owner = owner;
@@ -25,7 +26,9 @@ const gameboard = ( function () {
     }
   }
   const player = Player("Player", true, false, "X");
+  playersArray.push(player);
   const computer = Player("Computer", false, false, "O");
+  playersArray.push(computer);
 
   // Cache Dom
   const gameboard = document.getElementById("gameboard");
@@ -44,7 +47,7 @@ const gameboard = ( function () {
   }
   function _createGameboardTiles (num) {
     for (let i = 1; i < num; i++){
-      let gameTile = Tile(false, "", "", "");
+      let gameTile = Tile("vacant", "", "", "");
       GAMEBOARD.push(gameTile);
     }
   }
@@ -83,38 +86,46 @@ const gameboard = ( function () {
   function _changeOwner (obj, idx) {
     GAMEBOARD[idx].content = obj.marker;
     GAMEBOARD[idx].owner = obj.name;
-    GAMEBOARD[idx].status = true;
+    GAMEBOARD[idx].status = "occupied";
   }
   function _playGame (e) {
     let list = Array.from(gameboard.querySelectorAll(".game-cell"));
-
+    
     // Player's turn
-    let gamecell = e.target.closest(".game-cell");
-    let idx = list.indexOf(gamecell);
-    if (GAMEBOARD[idx].status === true) {
+    if (!player.curentTurn){
       return;
     } else {
-      _changeOwner(player, idx);
+      let gamecell = e.target.closest(".game-cell");
+      let idx = list.indexOf(gamecell);
+      if (GAMEBOARD[idx].status === "occupied") {
+        return;
+      } else {
+        _changeOwner(player, idx);
+      }
+      _render();
     }
-    _render();
-
+    
     // Computer's turn
     _switchTurn();
     _displayInfo();
-    setTimeout(_computerPlay, 500);
+    setTimeout(_computerPlay, 300);
 
     function _computerPlay () {
       let randomNum = Math.floor(Math.random() * GAMEBOARD.length);
-      while (GAMEBOARD[randomNum].status === true){
-        randomNum = Math.floor(Math.random() * GAMEBOARD.length);
-      }
+      while (GAMEBOARD.some(gameTile => gameTile.status === "vacant") &&
+        GAMEBOARD[randomNum].status === "occupied"){
+          randomNum = Math.floor(Math.random() * GAMEBOARD.length);
+        }
       _changeOwner(computer, randomNum);
       _switchTurn();
       _displayInfo();
       _render();
     }
-    
   }
+    
+  // Checkinf for winner
+  
+
   // Execution
   _init();
 })();
