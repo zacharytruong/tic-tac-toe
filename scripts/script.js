@@ -5,14 +5,12 @@ const gameboard = ( function () {
   const playersArray = [];
 
   // Setup factories
-  const Tile = (status, owner, content, div) => {
+  const Tile = (status, content, div) => {
     this.status = status;
-    this.owner = owner;
     this.content = content;
     this.div = div;
     return {
       status,
-      owner,
       content,
     }
   }
@@ -47,16 +45,6 @@ const gameboard = ( function () {
   gameboard.addEventListener("click", _playGame)
 
   // Functions
-  function _init () {
-    _createGameboardTiles(9);
-    _render();
-  }
-  function _createGameboardTiles (num) {
-    for (let i = 0; i < num; i++){
-      let gameTile = Tile("vacant", "", "", "");
-      GAMEBOARD.push(gameTile);
-    }
-  }
 
   // Only _render() touches DOM
   function _render () {
@@ -77,13 +65,22 @@ const gameboard = ( function () {
       info.innerText = `${currentPlayer.name}'s turn.`;
     }
   }
-  console.table(GAMEBOARD)
+
+  function _init () {
+    _createGameboardTiles(9);
+    _render();
+  }
+  function _createGameboardTiles (num) {
+    for (let i = 0; i < num; i++){
+      let gameTile = Tile("vacant", "", "");
+      GAMEBOARD.push(gameTile);
+    }
+  }
   function _reset () {
     player.currentTurn = true;
     computer.currentTurn = false;
     GAMEBOARD.forEach( gameTile => {
       gameTile.status = "vacant";
-      gameTile.owner = "";
       gameTile.content = "";
       gameTile.div = "";
     })
@@ -105,9 +102,8 @@ const gameboard = ( function () {
       computer.currentTurn = true;
     }
   }
-  function _changeOwner (obj, idx) {
+  function _changeStatus (obj, idx) {
     GAMEBOARD[idx].content = obj.marker;
-    GAMEBOARD[idx].owner = obj.name;
     GAMEBOARD[idx].status = "occupied";
     obj.ownLand.push(idx);
   }
@@ -131,7 +127,7 @@ const gameboard = ( function () {
         if (GAMEBOARD[idx].status === "occupied") {
           return;
         } else {
-          _changeOwner(player, idx);
+          _changeStatus(player, idx);
         }
         _validateWinner (playersArray);
         _render();
@@ -151,14 +147,13 @@ const gameboard = ( function () {
           GAMEBOARD[randomNum].status === "occupied"){
             randomNum = Math.floor(Math.random() * GAMEBOARD.length);
           }
-        _changeOwner(computer, randomNum);
+        _changeStatus(computer, randomNum);
         _switchTurn();
         _render();
       }
     }
   }
-    
-  // Checkinf for winner
+  
   function _validateWinner (arr) {
     const winner = arr.find( gamer => {
       return gamer.ownLand.includes(0) && gamer.ownLand.includes(1) && gamer.ownLand.includes(2) ||
