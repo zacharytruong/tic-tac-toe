@@ -32,9 +32,9 @@ const gameboard = ( function () {
   }
 
   // Generate players
-  const player = Player("Player", true, false, "X", "");
+  const player = Player("Player", true, false, "X", []);
   playersArray.push(player);
-  const computer = Player("Computer", false, false, "O", "");
+  const computer = Player("Computer", false, false, "O", []);
   playersArray.push(computer);
 
   // Cache Dom
@@ -48,11 +48,11 @@ const gameboard = ( function () {
 
   // Functions
   function _init () {
-    _createGameboardTiles(10);
+    _createGameboardTiles(9);
     _render();
   }
   function _createGameboardTiles (num) {
-    for (let i = 1; i < num; i++){
+    for (let i = 0; i < num; i++){
       let gameTile = Tile("vacant", "", "", "");
       GAMEBOARD.push(gameTile);
     }
@@ -77,6 +77,7 @@ const gameboard = ( function () {
       info.innerText = `${currentPlayer.name}'s turn.`;
     }
   }
+  console.table(GAMEBOARD)
   function _reset () {
     player.currentTurn = true;
     computer.currentTurn = false;
@@ -88,7 +89,7 @@ const gameboard = ( function () {
     })
     playersArray.forEach( gamer => {
       gamer.isWinner = false;
-      gamer.ownLand = "";
+      gamer.ownLand = [];
     })
     _render();
   }
@@ -108,7 +109,7 @@ const gameboard = ( function () {
     GAMEBOARD[idx].content = obj.marker;
     GAMEBOARD[idx].owner = obj.name;
     GAMEBOARD[idx].status = "occupied";
-    obj.ownLand += idx.toString();
+    obj.ownLand.push(idx);
   }
   function _playGame (e) {
     
@@ -153,22 +154,21 @@ const gameboard = ( function () {
         _changeOwner(computer, randomNum);
         _switchTurn();
         _render();
-        console.table(playersArray)
       }
     }
   }
     
   // Checkinf for winner
   function _validateWinner (arr) {
-    const winner = arr.find( el => {
-      return el.ownLand.split("").sort().join("").includes("012") ||
-            el.ownLand.split("").sort().join("").includes("345") ||
-            el.ownLand.split("").sort().join("").includes("678") ||
-            el.ownLand.split("").sort().join("").includes("036") ||
-            el.ownLand.split("").sort().join("").includes("147") ||
-            el.ownLand.split("").sort().join("").includes("025") ||
-            el.ownLand.split("").sort().join("").includes("048") ||
-            el.ownLand.split("").sort().join("").includes("246")
+    const winner = arr.find( gamer => {
+      return gamer.ownLand.includes(0) && gamer.ownLand.includes(1) && gamer.ownLand.includes(2) ||
+        gamer.ownLand.includes(3) && gamer.ownLand.includes(4) && gamer.ownLand.includes(5) ||
+        gamer.ownLand.includes(6) && gamer.ownLand.includes(7) && gamer.ownLand.includes(8) ||
+        gamer.ownLand.includes(0) && gamer.ownLand.includes(3) && gamer.ownLand.includes(6) ||
+        gamer.ownLand.includes(1) && gamer.ownLand.includes(4) && gamer.ownLand.includes(7) ||
+        gamer.ownLand.includes(2) && gamer.ownLand.includes(5) && gamer.ownLand.includes(8) ||
+        gamer.ownLand.includes(0) && gamer.ownLand.includes(4) && gamer.ownLand.includes(8) ||
+        gamer.ownLand.includes(2) && gamer.ownLand.includes(4) && gamer.ownLand.includes(6)
     });
     if (winner){
       winner.isWinner = true;
